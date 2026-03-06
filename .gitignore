@@ -1,3 +1,16 @@
+# Added manually
+dev.py
+dev_run.sh
+dev_test
+test_2M
+example
+config/service.json
+data/service/service.json
+processed
+results
+output
+data
+
 # Juypter
 .jupyter_ystore.db
 .ipynb_checkpoints

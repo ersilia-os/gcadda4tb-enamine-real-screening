@@ -12,9 +12,11 @@ This repository is part of the GC-ADDA4TB program to design potential degraders 
 
 Code in this repository does the following:
 
-1. It downloads a chunk of Enamine REAL containing 10M compounds alongside their ECFP6 fingerprints (already pre-calculated). These files are stored in Ersilia's Google Drive, so a service file (JSON format) is necessary to download these files (see Important notes). In total, there are 994 chunks, i.e. ~10B molecules. Chunk identifiers can be found in this file.
+1. Downloading a chunk of Enamine REAL containing 10M compounds alongside their ECFP6 fingerprints (already pre-calculated). These files are stored in Ersilia's Google Drive, so a service file (JSON format) is necessary to download them (see Important notes). In total, there are 994 chunks, i.e. ~10B molecules. Chunk identifiers can be found in [this file](https://github.com/ersilia-os/gcadda4tb-enamine-real-screening/blob/main/data/chunks/chunks.csv).
 
-2. ...
+2. When ECFP6 are available locally, all compounds are screened against NB-based surrogate models (x276) located in `data/models` (tracked with `eosvc`). The indices associated to compounds having a predicted active probabilitiy in the 1 and 5 percentile within each model are stored in `npz` format, within the `output` directory (tracked with `eosvc` as well).
+
+3. The downloaded file containig ECFP6s for 10M compounds is removed from the filesystem. 
 
 
 ## Usage
@@ -26,7 +28,7 @@ git clone https://github.com/ersilia-os/gcadda4tb-enamine-real-screening
 cd gcadda4tb-enamine-real-screening
 
 conda create -n gcadda4tb-enamine10b python=3.12
-conda gcadda4tb-enamine10b
+conda activate gcadda4tb-enamine10b
 pip install -r requirements.txt
 ```
 
@@ -40,6 +42,17 @@ Replace the placeholders:
 - `$CHUNK_NAME`: Name of the chunk to be screened.
 - `$OUTPUT_DIR`: Directory to save the output.
 
+To download NB-based surrogate models, simply run:
+
+```bash
+eosvc download --path data
+```
+
+To download final results:
+
+```bash
+eosvc download --path output
+```
 
 ## Important notes
 

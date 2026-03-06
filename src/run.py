@@ -1,6 +1,7 @@
 import argparse
-
+import os
 from core.utils import download_data, clean_data
+from core.core import screen
 
 
 def main():
@@ -12,13 +13,13 @@ def main():
 
     chunk_name = args.chunk_name
     output_dir = args.output_dir
+    output_dir = os.path.join(output_dir, chunk_name)
+    os.makedirs(output_dir, exist_ok=True)
     
 
     download_data(output_dir, chunk_name)
-    
-    # something here
-    
-    # clean_data(output_dir, chunk_name)
+    screen(output_dir, chunk_name)
+    clean_data(output_dir, chunk_name)
 
 
 if __name__ == "__main__":

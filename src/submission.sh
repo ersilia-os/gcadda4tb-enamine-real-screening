@@ -1,14 +1,14 @@
 #!/bin/bash
 #
 
-#SBATCH -J gardp-kpn
-#SBATCH --chdir=/aloy/home/acomajuncosa/Ersilia/gardp-kpneumoniae-enamine-real-screening
+#SBATCH -J gcadda4tb
+#SBATCH --chdir=/aloy/home/acomajuncosa/Ersilia/gcadda4tb-enamine-real-screening
 #SBATCH --time=24:00:00
 #SBATCH --ntasks=1
-#SBATCH --array=0-993%1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=32G
-#SBATCH --output=/aloy/scratch/acomajuncosa/Ersilia/gardp-kpneumoniae-enamine-real-screening/%x_%a.out
+#SBATCH --array=0-993%5
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=26G
+#SBATCH --output=/aloy/scratch/acomajuncosa/Ersilia/gcadda4tb-enamine-real-screening/%x_%a.out
 #SBATCH -p sbnb_cpu_sphr,sbnb_cpu_zen3
 
 # Loads default environment configuration

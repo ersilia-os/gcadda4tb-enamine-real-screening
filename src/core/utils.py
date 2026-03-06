@@ -25,47 +25,6 @@ def _get_identifiers_file(dir_path, chunk_name):
     return os.path.join(dir_path, f"{chunk_name}_SMILES_IDs.tsv.zip")
 
 
-def _get_h5_file(dir_path, chunk_name):
-    return os.path.join(dir_path, f"{chunk_name}.h5")
-
-
-def _get_probas_h5_file(dir_path, chunk_name):
-    return os.path.join(dir_path, f"{chunk_name}_probas.h5")
-
-
-def _get_passed_h5_file(dir_path, chunk_name):
-    return os.path.join(dir_path, f"{chunk_name}_passed.h5")
-
-
-def _get_hits_csv(dir_path, chunk_name):
-    return os.path.join(dir_path, f"{chunk_name}_hits.csv")
-
-
-def _get_stats_json(dir_path, chunk_name):
-    return os.path.join(dir_path, f"{chunk_name}_stats.json")
-
-
-def get_filenames(dir_path, chunk_name):
-    data_file = _get_data_file(dir_path, chunk_name)
-    identifiers_file = _get_identifiers_file(dir_path, chunk_name)
-    h5_file = _get_h5_file(dir_path, chunk_name)
-    hits_csv = _get_hits_csv(dir_path, chunk_name)
-    stats_json = _get_stats_json(dir_path, chunk_name)
-    h5_probas_file = _get_probas_h5_file(dir_path, chunk_name)
-    passed_h5_file = _get_passed_h5_file(dir_path, chunk_name)
-
-    results = {
-        "data_file": data_file,
-        "identifiers_file": identifiers_file,
-        "h5_file": h5_file,
-        "hits_csv": hits_csv,
-        "stats_json": stats_json,
-        "h5_probas_file": h5_probas_file,
-        "h5_passed_file": passed_h5_file,
-    }
-
-    return results
-
 
 def get_endpoints_dir():
     root = os.path.dirname(os.path.abspath(__file__))
@@ -134,61 +93,17 @@ def download_data(dir_path, chunk_name):
         os.remove(data_file)
     if os.path.exists(identifiers_file):
         os.remove(identifiers_file)
-    print(f"Downloading identifiers_file to {identifiers_file}...")
-    download_file(identifiers_file)
+    # print(f"Downloading identifiers_file to {identifiers_file}...")
+    # download_file(identifiers_file)
     print(f"Downloading data_file to {data_file}...")
     download_file(data_file)
     t1 = time.time()
     print(f"Download completed in {t1 - t0:.2f} seconds.")
 
 
-def copy_data(from_dir, output_dir, chunk_name):
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    data_file_src = _get_data_file(from_dir, chunk_name)
-    identifiers_file_src = _get_identifiers_file(from_dir, chunk_name)
-    data_file_dst = _get_data_file(output_dir, chunk_name)
-    identifiers_file_dst = _get_identifiers_file(output_dir, chunk_name)
-    print(f"Copying {data_file_src} to {data_file_dst}...")
-    os.system(f"cp {data_file_src} {data_file_dst}")
-    print(f"Copying {identifiers_file_src} to {identifiers_file_dst}...")
-    os.system(f"cp {identifiers_file_src} {identifiers_file_dst}")
-    print("Done with copying to output directory.")
-
-
-def convert_to_h5(dir_path, chunk_name, batch_size=100_000):
-    t0 = time.time()
-    print(f"Converting chunk {chunk_name} to H5 format...")
-    data_file = _get_data_file(dir_path, chunk_name)
-    identifiers_file = _get_identifiers_file(dir_path, chunk_name)
-    h5_file = _get_h5_file(dir_path, chunk_name)
-    identifiers = pd.read_csv(identifiers_file, compression="zip", delimiter="\t")
-    print(identifiers.head())
-    X = np.load(data_file)["X"]
-    n_rows, n_cols = X.shape
-    print(f"Identifiers rows: {len(identifiers)}, Data shape: {n_rows}, {n_cols}")
-    assert len(identifiers) == n_rows, "Row mismatch between X and identifiers"
-    with h5py.File(h5_file, "w") as f:
-        dset_X = f.create_dataset("values", shape=(n_rows, n_cols), dtype=ARRAY_DTYPE, chunks=(batch_size, n_cols), compression="gzip")
-        f.create_dataset("key", data=identifiers["id"].tolist(), dtype=h5py.string_dtype())
-        f.create_dataset("input", data=identifiers["smiles"].tolist(), dtype=h5py.string_dtype())
-        for start in tqdm(range(0, n_rows, batch_size), desc="Converting to H5"):
-            end = min(start + batch_size, n_rows)
-            X_batch = X[start:end].astype(ARRAY_DTYPE)
-            dset_X[start:end] = X_batch
-            del X_batch
-    t1 = time.time()
-    print(f"H5 file saved to {h5_file}")
-    print(f"Conversion completed in {t1 - t0:.2f} seconds.")
-    return h5_file
-
-
 def clean_data(dir_path, chunk_name):
-    print("Cleaning up intermediate files...")
-    all_files = get_filenames(dir_path, chunk_name)
-    for _, v in all_files.items():
-        if v.endswith("_hits.csv") or v.endswith("_stats.json"):
-            continue
-        if os.path.exists(v):
-            print(f"Removing {v}...")
-            os.remove(v)
+    print("Cleaning up intermediate file...")
+    all_files = [f"{chunk_name}_X.npz"]
+    for v in all_files:
+        print(f"Removing {v}...")
+        os.remove(os.path.join(dir_path, v))

@@ -2,7 +2,7 @@
 
 # Initialize conda
 eval "$(conda shell.bash hook)"
-conda activate /aloy/home/acomajuncosa/anaconda3/envs/gardp-kpn
+conda activate /aloy/home/acomajuncosa/anaconda3/envs/gcadda4tb-enamine10b
 
 # Get alpha from first argument
 alpha=$1
