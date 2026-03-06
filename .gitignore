@@ -9,7 +9,7 @@ data/service/service.json
 processed
 results
 output
-data
+data/**
 
 # Juypter
 .jupyter_ystore.db
